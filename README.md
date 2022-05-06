@@ -2,7 +2,7 @@
 
 目前已经无法爬取数据！！！
 
-由于宜出行的登录策略更新，导致无法使用qq登录直接爬取人流量的问题，近期进行了代码升级，已经解决了该问题，并且能顺利爬取数据，示例如下。目前暂不提供源代码，如有需要宜出行数据，可联系：917961898，进行爬取(非免费)，示例数据：
+由于宜出行的登录策略更新，导致无法使用qq登录直接爬取人流量的问题，近期进行了代码升级，已经解决了该问题，并且能顺利爬取数据，示例如下。示例数据：
 ![
 ](https://img-blog.csdnimg.cn/2019091609403833.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM0NDY0OTI2,size_16,color_FFFFFF,t_70)
 
