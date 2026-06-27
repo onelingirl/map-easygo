@@ -75,9 +75,23 @@ class easygospider():
     def get_cookie(self):
         while True:
             try:
-                chrome_login = webdriver.Chrome(executable_path="chromedriver.exe")
-                chrome_login.implicitly_wait(10)
-                chrome_login.get(
+                from selenium.webdriver.edge.options import Options as EdgeOptions
+                from selenium.webdriver.edge.service import Service as EdgeService
+                from selenium.webdriver.common.by import By
+                
+                options = EdgeOptions()
+                options.add_argument("--headless")
+                options.add_argument("--disable-gpu")
+                options.add_argument("--no-sandbox")
+                options.add_argument("--disable-dev-shm-usage")
+                options.add_argument("--window-size=1920,1080")
+                options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.0 Edg/135.0.0.0")
+                
+                service = EdgeService()
+                driver = webdriver.Edge(options=options, service=service)
+                driver.implicitly_wait(10)
+                driver.set_page_load_timeout(30)
+                driver.get(
                     "http://c.easygo.qq.com/eg_toc/map.html?origin=csfw&cityid=310000")
                 try:
                     qq_ = self.qq_number_list.pop()
@@ -86,30 +100,32 @@ class easygospider():
                     qq_ = self.qq_number_list.pop()
                 qq_num = qq_[0]
                 qq_passwd = qq_[1]
-                chrome_login.find_element_by_id("u").send_keys(qq_num)
-                chrome_login.find_element_by_id("p").send_keys(qq_passwd)
-                chrome_login.find_element_by_id("go").click()
+                driver.find_element(By.ID, "u").send_keys(qq_num)
+                driver.find_element(By.ID, "p").send_keys(qq_passwd)
+                driver.find_element(By.ID, "go").click()
                 #检查是否存在验证码
-                time.sleep(5)
-                if "安全验证" in chrome_login.page_source:
+                time.sleep(8)
+                page = driver.page_source
+                if "安全验证" in page or "验证码" in page or "验证" in page:
                     if settings.CAPTCHA_RECOGNIZ:
                         input('等待手动去除验证码')
                     else:
-                        chrome_login.close()
+                        driver.quit()
                         continue
 
                 #获取cookie
-                cookies = chrome_login.get_cookies()
-                chrome_login.quit()
+                cookies = driver.get_cookies()
+                driver.quit()
                 user_cookie = {}
                 for cookie in cookies:
                     user_cookie[cookie["name"]] = cookie["value"]
                 return user_cookie
             except WebDriverException as e:
-                pass
+                print("WebDriver error:", e)
+                time.sleep(2)
             finally:
                 try:
-                    chrome_login.close()
+                    driver.quit()
                 except Exception:
                     pass
 
@@ -167,32 +183,30 @@ class easygospider():
         df.to_csv(csv_name,index=False)
 
     def exec(self):
-        while True:
-            time_now = time.time()
-            time_now_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time_now))
-            write_log("此轮抓取开始")
-            cookie = self.get_cookie()
-            i = 1
-            params_list = self.initial_paramslist()
-            for params in params_list:
+        time_now = time.time()
+        time_now_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time_now))
+        write_log("此轮抓取开始")
+        cookie = self.get_cookie()
+        i = 1
+        params_list = self.initial_paramslist()
+        for params in params_list:
 
-                #这部分负责每个qq号码抓取的次数
-                if i % settings.fre == 0:
+            #这部分负责每个qq号码抓取的次数
+            if i % settings.fre == 0:
+                cookie = self.get_cookie()
+            while True:
+                try:
+                    text = self.spyder(cookie, params)
+                    self.save(text, time_now_str, file_name=self.filepath + self.filename + time_now_str + ".txt")
+                    break
+                except CookieException as e:
                     cookie = self.get_cookie()
-                while True:
-                    try:
-                        text = self.spyder(cookie, params)
-                        self.save(text, time_now_str, file_name=self.filepath + self.filename + time_now_str + ".txt")
-                        break
-                    except CookieException as e:
-                        cookie = self.get_cookie()
 
-                view_bar(i, len(params_list))
-                i += 1
-            write_log("此轮抓取完成，开始去重")
-            self.remove_duplicate(self.filepath + self.filename + time_now_str + ".txt")
-            write_log("去重完成,等待下一轮开始")
-            time.sleep(settings.sleeptime - int(time.time() - time_now))
+            view_bar(i, len(params_list))
+            i += 1
+        write_log("此轮抓取完成，开始去重")
+        self.remove_duplicate(self.filepath + self.filename + time_now_str + ".txt")
+        write_log("去重完成")
 
 
 def write_log(content):
