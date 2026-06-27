@@ -65,7 +65,7 @@ class easygospider():
                       "lng_max": lng_max,
                       "lat_min": lat_min,
                       "level": 16,
-                      "city": "厦门",
+                      "city": "上海",
                       "lat": "undefined",
                       "lng": "undefined",
                       "_token": ""}
@@ -78,7 +78,7 @@ class easygospider():
                 chrome_login = webdriver.Chrome(executable_path="chromedriver.exe")
                 chrome_login.implicitly_wait(10)
                 chrome_login.get(
-                    "http://c.easygo.qq.com/eg_toc/map.html?origin=csfw&cityid=110000")
+                    "http://c.easygo.qq.com/eg_toc/map.html?origin=csfw&cityid=310000")
                 try:
                     qq_ = self.qq_number_list.pop()
                 except IndexError:
