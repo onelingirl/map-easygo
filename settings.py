@@ -1,4 +1,4 @@
-﻿#! /usr/local/bin/python3
+#! /usr/local/bin/python3
 # coding: utf-8
 # __author__ = "Brady Hu"
 # __date__ = 2017/10/16 16:11
@@ -11,10 +11,11 @@ import os
 xy_name = "data.txt"
 
 #需要爬取的区域的四个方向点坐标
-city_bound_point_A = [114.286652,30.642638] #左上角点，x619
-city_bound_point_D = [114.239273,30.580588] #左下角点，农场十一队
-city_bound_point_B = [114.462433,30.574677] #右上角点，木妙
-city_bound_point_C = [114.418488,30.479746] #右下角点，牛场右下角
+# 上海海事大学临港校区（上海市浦东新区海港大道1550号）
+city_bound_point_A = [121.901, 30.879] #左上角点
+city_bound_point_D = [121.901, 30.867] #左下角点
+city_bound_point_B = [121.915, 30.879] #右上角点
+city_bound_point_C = [121.915, 30.867] #右下角点
 
 
 #下面设置文件存目录，不要设置在系统盘，不然会出现问题
